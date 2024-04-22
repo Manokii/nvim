@@ -3,7 +3,7 @@ local g = vim.g
 local M = {}
 local set_buf = api.nvim_set_current_buf
 
-g.nvchad_terms = {}
+g.terms = {}
 
 local pos_data = {
 	sp = { resize = "height", area = "lines" },
@@ -11,7 +11,7 @@ local pos_data = {
 }
 
 local config = {
-	hl = "Normal:term,WinSeparator:WinSeparator",
+	hl = "Normal:DefaultFloat,FloatBorder:BorderDark,FloatTitle:DefaultTitle",
 	sizes = { sp = 0.3, vsp = 0.2 },
 	float = {
 		relative = "editor",
@@ -24,18 +24,18 @@ local config = {
 }
 
 -- used for initially resizing terms
-vim.g.nvhterm = false
-vim.g.nvvterm = false
+vim.g.hterm = false
+vim.g.vterm = false
 
 -------------------------- util funcs -----------------------------
 local function save_term_info(index, val)
-	local terms_list = g.nvchad_terms
+	local terms_list = g.terms
 	terms_list[tostring(index)] = val
-	g.nvchad_terms = terms_list
+	g.terms = terms_list
 end
 
 local function opts_to_id(id)
-	for _, opts in pairs(g.nvchad_terms) do
+	for _, opts in pairs(g.terms) do
 		if opts.id == id then
 			return opts
 		end
@@ -70,17 +70,13 @@ local function display(opts)
 	vim.wo[win].number = false
 	vim.wo[win].relativenumber = false
 	-- vim.wo[win].foldcolumn = "0"
-	-- vim.wo[win].signcolumn = "no"
+	vim.wo[win].signcolumn = "no"
 	vim.bo[opts.buf].buflisted = false
 	vim.wo[win].winhl = opts.hl or config.hl
 	vim.cmd("startinsert")
 
 	-- resize non floating wins initially + or only when they're toggleable
-	if
-		(opts.pos == "sp" and not vim.g.nvhterm)
-		or (opts.pos == "vsp" and not vim.g.nvvterm)
-		or (opts.pos ~= "float")
-	then
+	if (opts.pos == "sp" and not vim.g.hterm) or (opts.pos == "vsp" and not vim.g.vterm) or (opts.pos ~= "float") then
 		local pos_type = pos_data[opts.pos]
 		local size = opts.size and opts.size or config.sizes[opts.pos]
 		local new_size = vim.o[pos_type.area] * size
@@ -110,8 +106,8 @@ local function create(opts)
 		vim.fn.termopen(cmd)
 	end
 
-	vim.g.nvhterm = opts.pos == "sp"
-	vim.g.nvvterm = opts.pos == "vsp"
+	vim.g.hterm = opts.pos == "sp"
+	vim.g.vterm = opts.pos == "vsp"
 end
 
 --------------------------- user api -------------------------------
@@ -164,5 +160,71 @@ api.nvim_create_autocmd("TermClose", {
 		save_term_info(args.buf, nil)
 	end,
 })
+
+--- UTILS
+M.toggle_vertical = function()
+	M.toggle({ pos = "vsp", id = "vtoggleTerm" })
+end
+
+M.toggle_horizontal = function()
+	M.toggle({ pos = "sp", id = "htoggleTerm" })
+end
+
+M.toggle_float = function()
+	M.toggle({ pos = "float", id = "floatTerm", float_opts = {
+		title = " Terminal ",
+		title_pos = "right",
+	} })
+end
+
+M.toggle_map = function(opts_list)
+	local toggle_list = {}
+
+	for i, opts in ipairs(opts_list) do
+		local conf = {
+			pos = "float",
+			id = opts.id,
+			visible = false,
+			float_opts = {
+				title = " Terminal " .. opts.id .. " ",
+				title_pos = "right",
+				row = 0.6,
+				col = 0.1,
+				width = 0.8,
+				height = 0.3,
+			},
+		}
+
+		toggle_list[i] = conf
+
+		vim.keymap.set({ "n", "t" }, opts.keymap, function()
+			for j, _ in ipairs(toggle_list) do
+				if opts.id == toggle_list[j].id then
+					M.toggle(toggle_list[j])
+					if toggle_list[j].visible then
+						toggle_list[j].visible = false
+					else
+						toggle_list[j].visible = true
+					end
+				else
+					if toggle_list[j].visible then
+						local x = opts_to_id(toggle_list[j].id)
+
+						if (x == nil or not api.nvim_buf_is_valid(x.buf)) or vim.fn.bufwinid(x.buf) == -1 then
+						else
+							api.nvim_win_close(x.win, true)
+							toggle_list[j].visible = false
+						end
+					end
+				end
+			end
+		end, { desc = opts.desc })
+	end
+end
+
+M.close = function()
+	local win = vim.api.nvim_get_current_win()
+	vim.api.nvim_win_close(win, true)
+end
 
 return M

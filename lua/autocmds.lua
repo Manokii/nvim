@@ -1,3 +1,5 @@
+local lualine = require("lualine")
+
 vim.api.nvim_create_autocmd("TextYankPost", {
 	desc = "Highlight when yanking (copying) text",
 	group = vim.api.nvim_create_augroup("kickstart-highlight-yank", { clear = true }),
@@ -5,8 +7,6 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 		vim.highlight.on_yank()
 	end,
 })
-
-local lualine = require("lualine")
 
 vim.api.nvim_create_autocmd("RecordingEnter", {
 	callback = function()
@@ -34,5 +34,13 @@ vim.api.nvim_create_autocmd("RecordingLeave", {
 				})
 			end)
 		)
+	end,
+})
+
+local lint_augroup = vim.api.nvim_create_augroup("lint", { clear = true })
+vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "InsertLeave" }, {
+	group = lint_augroup,
+	callback = function()
+		require("lint").try_lint()
 	end,
 })

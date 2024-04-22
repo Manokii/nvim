@@ -23,31 +23,119 @@ return { -- Autocompletion
 		"hrsh7th/cmp-nvim-lsp",
 		"hrsh7th/cmp-path",
 	},
+
 	config = function()
 		local cmp = require("cmp")
 		local luasnip = require("luasnip")
-		luasnip.config.setup({})
 
-		cmp.setup({
+		local opts = {
+			icons = true,
+			lspkind_text = true,
+		}
+
+		local formatting_style = {
+			-- default fields order i.e completion word + item.kind + item.kind icons
+			fields = { "abbr", "kind", "menu" },
+
+			format = function(_, item)
+				local icons = {
+					Namespace = "󰌗",
+					Text = "󰉿",
+					Method = "󰆧",
+					Function = "󰆧",
+					Constructor = "",
+					Field = "󰜢",
+					Variable = "󰀫",
+					Class = "󰠱",
+					Interface = "",
+					Module = "",
+					Property = "󰜢",
+					Unit = "󰑭",
+					Value = "󰎠",
+					Enum = "",
+					Keyword = "󰌋",
+					Snippet = "",
+					Color = "󰏘",
+					File = "󰈚",
+					Reference = "󰈇",
+					Folder = "󰉋",
+					EnumMember = "",
+					Constant = "󰏿",
+					Struct = "󰙅",
+					Event = "",
+					Operator = "󰆕",
+					TypeParameter = "󰊄",
+					Table = "",
+					Object = "󰅩",
+					Tag = "",
+					Array = "[]",
+					Boolean = "",
+					Number = "",
+					Null = "󰟢",
+					String = "󰉿",
+					Calendar = "",
+					Watch = "󰥔",
+					Package = "",
+					Copilot = "",
+					Codeium = "",
+					TabNine = "",
+				}
+				local icon = (opts.icons and icons[item.kind]) or ""
+
+				icon = opts.lspkind_text and ("\t\t" .. icon .. " ") or icon
+				item.kind = string.format("%s %s", icon, opts.lspkind_text and item.kind or "")
+
+				return item
+			end,
+		}
+
+		local function border(hl_name)
+			return {
+				{ "╭", hl_name },
+				{ "─", hl_name },
+				{ "╮", hl_name },
+				{ "│", hl_name },
+				{ "╯", hl_name },
+				{ "─", hl_name },
+				{ "╰", hl_name },
+				{ "│", hl_name },
+			}
+		end
+
+		local options = {
+			completion = {
+				completeopt = "menu,menuone",
+			},
+
+			window = {
+				completion = {
+					side_padding = 1,
+					winhighlight = "Normal:DefaultFloat,CursorLine:DefaultSelection,Search:None",
+					scrollbar = false,
+				},
+				documentation = {
+					border = border("CmpDocBorder"),
+					winhighlight = "Normal:DefaultFloat",
+				},
+			},
 			snippet = {
 				expand = function(args)
 					luasnip.lsp_expand(args.body)
 				end,
 			},
-			completion = { completeopt = "menu,menuone,noinsert" },
-			mapping = cmp.mapping.preset.insert({
+
+			formatting = formatting_style,
+
+			mapping = {
 				["<C-n>"] = cmp.mapping.select_next_item(),
 				["<C-p>"] = cmp.mapping.select_prev_item(),
 				["<C-b>"] = cmp.mapping.scroll_docs(-4),
 				["<C-f>"] = cmp.mapping.scroll_docs(4),
-				["<C-y>"] = cmp.mapping.confirm({ select = true }),
-
-				--['<CR>'] = cmp.mapping.confirm { select = true },
+				["<C-Space>"] = cmp.mapping.complete({}),
+				["<CR>"] = cmp.mapping.confirm({ select = true }),
+				-- ["<C-y>"] = cmp.mapping.confirm({ select = true }),
 				--['<Tab>'] = cmp.mapping.select_next_item(),
 				--['<S-Tab>'] = cmp.mapping.select_prev_item(),
-
-				-- Manually trigger a completion from nvim-cmp.
-				["<C-Space>"] = cmp.mapping.complete({}),
 
 				-- <c-l> will move you to the right of each of the expansion locations.
 				-- <c-h> is similar, except moving you backwards.
@@ -61,15 +149,18 @@ return { -- Autocompletion
 						luasnip.jump(-1)
 					end
 				end, { "i", "s" }),
-
-				-- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
-				--    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
-			}),
+			},
 			sources = {
 				{ name = "nvim_lsp" },
 				{ name = "luasnip" },
+				{ name = "buffer" },
+				{ name = "nvim_lua" },
 				{ name = "path" },
 			},
-		})
+		}
+
+		options.window.completion.border = border("CmpBorder")
+
+		cmp.setup(options)
 	end,
 }

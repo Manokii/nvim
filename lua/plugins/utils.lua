@@ -1,17 +1,17 @@
 return {
-	"tpope/vim-sleuth",
+	{ "tpope/vim-sleuth" },
+	{ "mg979/vim-visual-multi" }, -- Visual multi cursor
 	{ "numToStr/Comment.nvim", opts = {} },
 	{
 		"windwp/nvim-autopairs",
 		event = "InsertEnter",
-		-- Optional dependency
 		dependencies = { "hrsh7th/nvim-cmp" },
 		config = function()
 			require("nvim-autopairs").setup({})
 			-- If you want to automatically add `(` after selecting a function or method
-			local cmp_autopairs = require("nvim-autopairs.completion.cmp")
-			local cmp = require("cmp")
-			cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())
+			-- local cmp_autopairs = require("nvim-autopairs.completion.cmp")
+			-- local cmp = require("cmp")
+			-- cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())
 		end,
 	},
 	{
@@ -20,8 +20,8 @@ return {
 		dependencies = { "nvim-lua/plenary.nvim" },
 		opts = { signs = false },
 	},
-	{ -- Collection of various small independent plugins/modules
-		"echasnovski/mini.nvim",
+	{
+		"echasnovski/mini.nvim", -- Collection of various small independent plugins/modules
 		config = function()
 			-- Better Around/Inside textobjects
 			--

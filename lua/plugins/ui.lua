@@ -1,8 +1,34 @@
+local noice_search = {
+	view = "cmdline",
+	opts = {
+		align = "bottom",
+		size = { width = "100%" },
+		position = { row = "100%", col = "0" },
+		border = { style = "none", padding = { 0, 0 } },
+	},
+}
+
 return {
 	{
 		"folke/noice.nvim",
 		event = "VeryLazy",
 		opts = {
+			cmdline = {
+				enabled = true,
+				view = "cmdline_popup",
+				format = {
+					search_down = noice_search,
+					search_up = noice_search,
+				},
+				opts = {
+					align = "center",
+					position = { row = 2, col = "50%" },
+					border = { style = "none", padding = { 1, 2 } },
+					win_options = {
+						winhighlight = { Normal = "NormalFloat", FloatBorder = "NormalFloat" },
+					},
+				},
+			},
 			lsp = {
 				-- override markdown rendering so that **cmp** and other plugins use **Treesitter**
 				override = {
@@ -11,13 +37,12 @@ return {
 					["cmp.entry.get_documentation"] = true, -- requires hrsh7th/nvim-cmp
 				},
 			},
-			-- you can enable a preset for easier configuration
 			presets = {
-				bottom_search = true, -- use a classic bottom cmdline for search
-				command_palette = true, -- position the cmdline and popupmenu together
+				-- bottom_search = true, -- use a classic bottom cmdline for search
+				-- command_palette = true, -- position the cmdline and popupmenu together
 				long_message_to_split = true, -- long messages will be sent to a split
-				inc_rename = false, -- enables an input dialog for inc-rename.nvim
-				lsp_doc_border = false, -- add a border to hover docs and signature help
+				inc_rename = true, -- enables an input dialog for inc-rename.nvim
+				-- lsp_doc_border = false, -- add a border to hover docs and signature help
 			},
 		},
 		dependencies = {
@@ -60,8 +85,8 @@ return {
 
 	{
 		"folke/which-key.nvim",
-		event = "VimEnter", -- Sets the loading event to 'VimEnter'
-		config = function() -- This is the function that runs, AFTER loading
+		event = "VimEnter",
+		config = function()
 			require("which-key").setup()
 
 			-- Document existing key chains
@@ -69,9 +94,10 @@ return {
 				["<leader>c"] = { name = "[C]ode", _ = "which_key_ignore" },
 				["<leader>d"] = { name = "[D]ocument", _ = "which_key_ignore" },
 				["<leader>r"] = { name = "[R]ename", _ = "which_key_ignore" },
-				["<leader>s"] = { name = "[S]earch", _ = "which_key_ignore" },
-				["<leader>w"] = { name = "[W]orkspace", _ = "which_key_ignore" },
+				["<leader>f"] = { name = "[F]ind", _ = "which_key_ignore" },
+				["<leader>w"] = { name = "[W]hichKey", _ = "which_key_ignore" },
 				["<leader>t"] = { name = "[T]oggle", _ = "which_key_ignore" },
+				["<leader>g"] = { name = "[G]oto LSP", _ = "which_key_ignore" },
 				["<leader>h"] = { name = "Git [H]unk", _ = "which_key_ignore" },
 			})
 			require("which-key").register({
@@ -89,57 +115,84 @@ return {
 	},
 	{
 		"lewis6991/gitsigns.nvim",
-		opts = {
-			on_attach = function(bufnr)
-				local gitsigns = require("gitsigns")
+		opts = {},
+	},
+	{
+		"nvim-tree/nvim-tree.lua",
+		cmd = { "NvimTreeToggle", "NvimTreeFocus" },
+		config = function()
+			require("nvim-tree").setup({
+				filters = {
+					dotfiles = false,
+					custom = { "^.git", "^node_modules" },
+				},
+				disable_netrw = true,
+				hijack_netrw = true,
+				hijack_cursor = true,
+				hijack_unnamed_buffer_when_opening = false,
+				sync_root_with_cwd = true,
+				update_focused_file = {
+					enable = true,
+					update_root = false,
+				},
+				view = {
+					adaptive_size = false,
+					side = "left",
+					width = 30,
+					preserve_window_proportions = true,
+				},
+				git = { enable = true },
+				filesystem_watchers = {
+					enable = true,
+				},
+				actions = {
+					open_file = {
+						resize_window = true,
+					},
+				},
+				renderer = {
+					root_folder_label = false,
+					highlight_git = true,
+					highlight_opened_files = "none",
 
-				local function map(mode, l, r, opts)
-					opts = opts or {}
-					opts.buffer = bufnr
-					vim.keymap.set(mode, l, r, opts)
-				end
+					indent_markers = {
+						enable = true,
+					},
 
-				-- Navigation
-				map("n", "]c", function()
-					if vim.wo.diff then
-						vim.cmd.normal({ "]c", bang = true })
-					else
-						gitsigns.nav_hunk("next")
-					end
-				end, { desc = "Jump to next git [c]hange" })
+					icons = {
+						show = {
+							file = true,
+							folder = true,
+							folder_arrow = false,
+							git = true,
+						},
 
-				map("n", "[c", function()
-					if vim.wo.diff then
-						vim.cmd.normal({ "[c", bang = true })
-					else
-						gitsigns.nav_hunk("prev")
-					end
-				end, { desc = "Jump to previous git [c]hange" })
-
-				-- Actions
-				-- visual mode
-				map("v", "<leader>hs", function()
-					gitsigns.stage_hunk({ vim.fn.line("."), vim.fn.line("v") })
-				end, { desc = "stage git hunk" })
-				map("v", "<leader>hr", function()
-					gitsigns.reset_hunk({ vim.fn.line("."), vim.fn.line("v") })
-				end, { desc = "reset git hunk" })
-				-- normal mode
-				map("n", "<leader>hs", gitsigns.stage_hunk, { desc = "git [s]tage hunk" })
-				map("n", "<leader>hr", gitsigns.reset_hunk, { desc = "git [r]eset hunk" })
-				map("n", "<leader>hS", gitsigns.stage_buffer, { desc = "git [S]tage buffer" })
-				map("n", "<leader>hu", gitsigns.undo_stage_hunk, { desc = "git [u]ndo stage hunk" })
-				map("n", "<leader>hR", gitsigns.reset_buffer, { desc = "git [R]eset buffer" })
-				map("n", "<leader>hp", gitsigns.preview_hunk, { desc = "git [p]review hunk" })
-				map("n", "<leader>hb", gitsigns.blame_line, { desc = "git [b]lame line" })
-				map("n", "<leader>hd", gitsigns.diffthis, { desc = "git [d]iff against index" })
-				map("n", "<leader>hD", function()
-					gitsigns.diffthis("@")
-				end, { desc = "git [D]iff against last commit" })
-				-- Toggles
-				map("n", "<leader>tb", gitsigns.toggle_current_line_blame, { desc = "[T]oggle git show [b]lame line" })
-				map("n", "<leader>tD", gitsigns.toggle_deleted, { desc = "[T]oggle git show [D]eleted" })
-			end,
-		},
+						glyphs = {
+							default = "󰈚",
+							symlink = "",
+							folder = {
+								default = "",
+								empty = "",
+								empty_open = "",
+								open = "",
+								symlink = "",
+								symlink_open = "",
+								arrow_open = "",
+								arrow_closed = "",
+							},
+							git = {
+								unstaged = "✗",
+								staged = "✓",
+								unmerged = "",
+								renamed = "➜",
+								untracked = "★",
+								deleted = "",
+								ignored = "◌",
+							},
+						},
+					},
+				},
+			})
+		end,
 	},
 }
