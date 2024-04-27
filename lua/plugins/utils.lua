@@ -39,4 +39,9 @@ return {
 			require("mini.surround").setup()
 		end,
 	},
+	{
+		"luckasRanarison/tailwind-tools.nvim",
+		dependencies = { "nvim-treesitter/nvim-treesitter" },
+		opts = {},
+	},
 }
