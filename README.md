@@ -3,12 +3,14 @@
 ```sh
 git clone https://github.com/manokii/nvim.git ~/.config/nvim
 ```
+
 > [!Note]
 > Note, this will fail if you have an existing `~/.config/nvim` folder
 
 After cloning, just run `nvim` and it should automatically install all dependencies.
 
 ## File Structure
+
 ```
  .
 ├──  init.lua              - Init File, this file runs at startup

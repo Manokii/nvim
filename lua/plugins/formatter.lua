@@ -1,4 +1,4 @@
-return { -- Formatter
+return {
 	"stevearc/conform.nvim",
 	event = { "BufReadPre", "BufNewFile" },
 	opts = {
@@ -19,7 +19,7 @@ return { -- Formatter
 			html = { { "biome-check", "biome" } },
 			json = { { "biome-check", "biome" } },
 			yaml = { { "biome-check", "biome" } },
-			markdown = { { "biome-check", "biome" } },
+			markdown = { "biome" },
 			grapql = { { "biome-check", "biome" } },
 			lua = { "stylua" },
 		},
