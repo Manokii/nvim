@@ -112,6 +112,17 @@ return {
 			vim.cmd.colorscheme("tokyonight-night")
 			vim.cmd.hi("Comment gui=none")
 		end,
+		opts = function()
+			local transparent = true
+
+			if vim.g.neovide then
+				transparent = false
+			end
+
+			return {
+				transparent = transparent,
+			}
+		end,
 	},
 	{
 		"lewis6991/gitsigns.nvim",

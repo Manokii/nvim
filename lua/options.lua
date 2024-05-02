@@ -34,3 +34,7 @@ vim.opt.listchars:append({ tab = "  ", precedes = "←", extends = "→", nbsp =
 vim.opt.list = true
 vim.opt.breakindent = true
 vim.opt.showbreak = "↳ "
+
+if vim.g.neovide then
+	vim.o.guifont = "JetBrainsMono Nerd Font"
+end
