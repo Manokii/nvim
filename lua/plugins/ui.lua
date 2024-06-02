@@ -135,7 +135,7 @@ return {
 			require("nvim-tree").setup({
 				filters = {
 					dotfiles = false,
-					custom = { "^.git", "^node_modules" },
+					custom = { "^.git$", "^node_modules" },
 				},
 				disable_netrw = true,
 				hijack_netrw = true,
