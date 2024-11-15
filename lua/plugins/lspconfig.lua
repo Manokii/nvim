@@ -53,7 +53,7 @@ return {
 			cssls = {},
 			jsonls = {},
 			tailwindcss = {},
-			tsserver = {
+			ts_ls = {
 				settings = {
 					javascript = {
 						inlayHints = {

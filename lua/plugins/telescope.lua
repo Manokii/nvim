@@ -25,8 +25,14 @@ return {
 					"pnpm-lock.yaml",
 					".git",
 				},
-				layout_strategy = "horizontal",
+				layout_strategy = "vertical",
 				layout_config = {
+					vertical = {
+						width = 0.94,
+						height = 0.94,
+						mirror = true,
+						prompt_position = "top",
+					},
 					horizontal = {
 						prompt_position = "top",
 					},

@@ -87,24 +87,36 @@ return {
 		"folke/which-key.nvim",
 		event = "VimEnter",
 		config = function()
-			require("which-key").setup()
+			local wk = require("which-key")
+			wk.setup()
 
 			-- Document existing key chains
-			require("which-key").register({
-				["<leader>c"] = { name = "[C]ode", _ = "which_key_ignore" },
-				["<leader>d"] = { name = "[D]ocument", _ = "which_key_ignore" },
-				["<leader>r"] = { name = "[R]ename", _ = "which_key_ignore" },
-				["<leader>f"] = { name = "[F]ind", _ = "which_key_ignore" },
-				["<leader>w"] = { name = "[W]hichKey", _ = "which_key_ignore" },
-				["<leader>t"] = { name = "[T]oggle", _ = "which_key_ignore" },
-				["<leader>g"] = { name = "[G]oto LSP", _ = "which_key_ignore" },
-				["<leader>h"] = { name = "Git [H]unk", _ = "which_key_ignore" },
+			wk.add({
+				{ "<leader>c", desc = "Code" },
+				{ "<leader>d", desc = "Document" },
+				{ "<leader>r", desc = "Rename" },
+				{ "<leader>f", desc = "Find" },
+				{ "<leader>w", desc = "WhichKey" },
+				{ "<leader>t", desc = "Toggle" },
+				{ "<leader>g", desc = "Goto LSP" },
+				{ "<leader>h", desc = "Git hunk" },
+				{
+					mode = "v",
+					{ "<leader>h", "Git [H]unk" },
+				},
 			})
-			require("which-key").register({
-				["<leader>h"] = { "Git [H]unk" },
-			}, { mode = "v" })
 		end,
+		keys = {
+			{
+				"<leader>?",
+				function()
+					require("which-key").show({ global = false })
+				end,
+				desc = "Buffer Local Keymaps (which-key)",
+			},
+		},
 	},
+
 	{
 		"folke/tokyonight.nvim",
 		priority = 1000, -- Make sure to load this before all the other start plugins.
@@ -147,7 +159,7 @@ return {
 					update_root = false,
 				},
 				view = {
-					adaptive_size = false,
+					adaptive_size = true,
 					side = "left",
 					width = 30,
 					preserve_window_proportions = true,

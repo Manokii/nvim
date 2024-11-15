@@ -10,8 +10,8 @@ local HL_Colors = {
 	TelescopePromptTitle = { bg = colors.bg_search, fg = colors.fg },
 
 	TelescopePreviewNormal = { bg = colors.bg_sidebar },
-	TelescopePreviewBorder = { bg = colors.bg_sidebar, fg = colors.bg_sidebar },
-	TelescopePreviewTitle = { bg = colors.bg_sidebar, fg = colors.bg_sidebar },
+	-- TelescopePreviewBorder = { bg = colors.bg_sidebar, fg = colors.bg_sidebar },
+	-- TelescopePreviewTitle = { bg = colors.bg_sidebar, fg = colors.bg_sidebar },
 
 	TelescopeResultsNormal = { bg = colors.bg_sidebar },
 	TelescopeResultsBorder = { bg = colors.bg_sidebar, fg = colors.bg_sidebar },

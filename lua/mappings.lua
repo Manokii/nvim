@@ -60,7 +60,7 @@ map("n", "<leader>ll", etc.lint, { desc = "Utils Lint current file" })
 map("n", "<leader>fm", etc.format, { desc = "Utils Format Files" })
 
 -- Comment
-map("n", "<leader>/", etc.toggle_comment_line, { desc = " Toggle" })
+map("n", "<leader>/", etc.toggle_comment_line, { desc = "Toggle Comment" })
 map("v", "<leader>/", etc.toggle_comment_visual, { desc = "Comment Toggle" })
 
 -- Nvimtree
